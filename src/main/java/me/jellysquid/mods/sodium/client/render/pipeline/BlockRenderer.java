@@ -119,7 +119,7 @@ public class BlockRenderer {
                             BlockColorProvider colorProvider, BakedQuad bakedQuad, QuadLightData light, ChunkRenderData.Builder renderData) {
         ModelQuadView src = (ModelQuadView) bakedQuad;
 
-        ModelQuadOrientation order = ModelQuadOrientation.orient(light.br);
+        ModelQuadOrientation order = ModelQuadOrientation.orient(light.br, light.lm);
 
         int[] colors = null;
 
