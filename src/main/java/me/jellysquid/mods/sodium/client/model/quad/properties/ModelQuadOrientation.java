@@ -1,8 +1,5 @@
 package me.jellysquid.mods.sodium.client.model.quad.properties;
 
-import me.jellysquid.mods.sodium.client.SodiumClientMod;
-import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
-
 /**
  * Defines the orientation of vertices in a model quad. This information be used to re-orient the quad's vertices to a
  * consistent order, eliminating a number of shading issues caused by anisotropy problems.
@@ -29,11 +26,6 @@ public enum ModelQuadOrientation {
      */
     public static ModelQuadOrientation orient(float[] brightnesses, int[] lightmaps) {
         // If one side of the quad is brighter, flip the sides
-        int[] worldLight = new int[4];
-        for (int i = 0; i < 4; i++) {
-            // Use only the brightest of block or sky light for each vertex
-            worldLight[i] = Math.max(lightmaps[i] & 255, lightmaps[i] >> 16);
-        }
 
         // Prioritize ambient occlusion over block/sky light
         if (brightnesses[0] + brightnesses[2] > brightnesses[1] + brightnesses[3]) {
@@ -42,24 +34,33 @@ public enum ModelQuadOrientation {
             return FLIP;
         }
 
-        // This simple check works in most cases
+        // Use only the brightest of block or sky light for each vertex
+        int[] worldLight = new int[4];
+        for (int i = 0; i < 4; i++) {
+            worldLight[i] = Math.max(lightmaps[i] & 255, lightmaps[i] >> 16);
+        }
+
+        // Check which diagonal has the brightest vertex
         if (Math.max(worldLight[0], worldLight[2]) < Math.max(worldLight[1], worldLight[3])) {
             return FLIP;
         } else if (Math.max(worldLight[0], worldLight[2]) > Math.max(worldLight[1], worldLight[3])) {
             return NORMAL;
         }
 
-        // Only use a more complex set of checks if Smooth lighting is set to high quality
-        if (SodiumClientMod.options().quality.smoothLighting == SodiumGameOptions.LightingQuality.HIGH) {
-        // check if at least three vertices have identical light levels
-            if ((worldLight[0] == worldLight[2] | worldLight[1] == worldLight[3]) & (worldLight[0] == worldLight[1] | worldLight[2] == worldLight[3])) {
-                // check if either of the diagonals are not equal
-                if (worldLight[0] != worldLight[2]) {
-                    return NORMAL;
-                } else if (worldLight[1] != worldLight[3]) {
-                    return FLIP;
-                }
+        // Check if three vertices have identical light levels
+        if (worldLight[0] == worldLight[1] ^ worldLight[2] == worldLight[3]) {
+            if (worldLight[0] == worldLight[2]) {
+                return FLIP;
+            } else if (worldLight[1] == worldLight[3]) {
+                return NORMAL;
             }
+        }
+
+        // Same as the ambient occlusion check, but returns the opposite orientation
+        if (worldLight[0] + worldLight[2] > worldLight[1] + worldLight[3]) {
+            return FLIP;
+        } else if (worldLight[0] + worldLight[2] < worldLight[1] + worldLight[3]) {
+            return NORMAL;
         }
 
         // if all previous checks fail, return the default orientation
