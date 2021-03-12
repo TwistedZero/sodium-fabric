@@ -10,7 +10,7 @@ public class ModelVertexUtil {
         // Since we're skipping the scaling formerly done in ChunkModelVertexTransformer to preserve precision, this
         // method actually takes input unnormalized within the range 0..32, and expands that to 0..65536.
         // TODO: Restructure things to be less arbitrary here
-        return (short) (value * 2048.0f);
+        return (short) Math.round(value * 2048.0f);
     }
 
     /**
@@ -19,7 +19,7 @@ public class ModelVertexUtil {
      * @return The resulting de-normalized unsigned short
      */
     public static short denormalizeVertexTextureFloatAsShort(float value) {
-        return (short) (value * 32768.0f);
+        return (short) Math.round(value * 32768.0f);
     }
 
     /**
