@@ -63,9 +63,9 @@ public class ChunkRenderBounds {
                     Math.max(y1, origin.getMinY()) - 0.5f,
                     Math.max(z1, origin.getMinZ()) - 0.5f,
 
-                    Math.min(x2, origin.getMaxX()) + 0.5f,
-                    Math.min(y2, origin.getMaxY()) + 0.5f,
-                    Math.min(z2, origin.getMaxZ()) + 0.5f
+                    Math.min(x2, origin.getMaxX() + 1) + 0.5f,
+                    Math.min(y2, origin.getMaxY() + 1) + 0.5f,
+                    Math.min(z2, origin.getMaxZ() + 1) + 0.5f
             );
         }
 
